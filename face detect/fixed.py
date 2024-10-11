@@ -1,4 +1,4 @@
-# import serial
+                                                                                                                           # import serial
 # import time
 import cv2
 import os
@@ -106,12 +106,5 @@ while True:
     # cv2.imshow('gray', gc)
     # cv2.imshow('img', ic)
     cv2.imshow('bin', binary)
-    # Stop if escape key is pressed
-    k = cv2.waitKey(30) & 0xff
-    if k == 27:
-        break
-
-# Release the VideoCapture object
-cap.release()
-cv2.destroyAllWindows()
+D
 
