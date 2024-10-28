@@ -1,12 +1,12 @@
-# import serial
-# import time
+import serial
+import time
 import cv2
 import os
 
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 cap = cv2.VideoCapture(0)
 
-base_folder = 'captured_data'
+base_folder = 'Captured'
 if not os.path.exists(base_folder):
     os.makedirs(base_folder)
 
@@ -34,8 +34,8 @@ while True:
     _, img = cap.read() #main_window
     _, img_frame = cap.read() #rgb_taken
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) #gray_taken
-    _, binary = cv2.threshold(gray, 110,255, cv2.THRESH_BINARY) #bin_taken
-    faces = face_cascade.detectMultiScale(gray, 1.1, 5)
+    _, binary = cv2.threshold(gray, 100,255, cv2.THRESH_BINARY) #bin_taken
+    faces = face_cascade.detectMultiScale(gray, 1.1, 9)
 
 
     for (x, y, w, h) in faces:
@@ -63,11 +63,13 @@ while True:
         #--------------------------------------------------------------------------------------------------------------------------------------------------------
         # BinaryPanel
 
+        #Rescaling Section
         ix, iy, iw, ih = x + 20, y + 35, w - 40, h - 80
         ic = img_frame [iy:iy+ih, ix:ix+iw]
         gc = gray[iy:iy+ih, ix:ix+iw]
         bc = binary[iy:iy+ih, ix:ix+iw]
 
+        #Binerization Section
         data = (bc/255).astype(int)
 
 
@@ -80,17 +82,30 @@ while True:
             cv2.imwrite(os.path.join(gray_folder, gray_filename), gc)
             cv2.imwrite(os.path.join(binary_folder, binary_filename), bc)
 
-
+            # Writing Data File
             with open(os.path.join(data_folder, data_filename), 'w') as file:
                 for row in data:
                     file.write(''.join(map(str, row)) + '\n')
-
 
             file_count += 1
             rgb_filename = f'img_{file_count}_rgb.jpg'
             gray_filename = f'img_{file_count}_gray.jpg'
             binary_filename = f'img_{file_count}_binary.jpg'
             data_filename = f'data{file_count}.txt'
+
+            # # Serial Comms
+            # ser = serial.Serial('COM1', 9600)
+            # ser.write(str(data_filename).encode())
+            # ser.write(b'\n')
+            # for row in data:
+            #     ser.write(b'[')
+            #     for element in row:
+            #         ser.write(str(element).encode())
+            #         ser.write(b'')
+            #     ser.write(b']\n')
+            #     time.sleep(0.01)
+            # ser.write(b'\n')
+            # ser.close()
 
         elif 151 <= w <= 170 and 151 <= h <= 170:
             cv2.putText(img, f"don't get close: {inner_w} x {inner_h}", (10, 21), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 185, 255), 2)
@@ -103,8 +118,8 @@ while True:
 
     # Display
     cv2.imshow('main', img)
-    # cv2.imshow('gray', gc)
-    # cv2.imshow('img', ic)
+    # cv2.imshow('gray', gray)
+    # cv2.imshow('img', img_frame)
     cv2.imshow('bin', binary)
     # Stop if escape key is pressed
     k = cv2.waitKey(30) & 0xff
