@@ -1,8 +1,5 @@
-
 import serial
 import time
-# import serial
-# import time
 import cv2
 import os
 
@@ -96,19 +93,19 @@ while True:
             binary_filename = f'img_{file_count}_binary.jpg'
             data_filename = f'data{file_count}.txt'
 
-            # # Serial Comms
-            # ser = serial.Serial('COM1', 9600)
-            # ser.write(str(data_filename).encode())
-            # ser.write(b'\n')
-            # for row in data:
-            #     ser.write(b'[')
-            #     for element in row:
-            #         ser.write(str(element).encode())
-            #         ser.write(b'')
-            #     ser.write(b']\n')
-            #     time.sleep(0.01)
-            # ser.write(b'\n')
-            # ser.close()
+            # Serial Comms
+            ser = serial.Serial('COM1', 9600)
+            ser.write(str(data_filename).encode())
+            ser.write(b'\n')
+            for row in data:
+                ser.write(b'[')
+                for element in row:
+                    ser.write(str(element).encode())
+                    ser.write(b'')
+                ser.write(b']\n')
+                time.sleep(0.01)
+            ser.write(b'\n')
+            ser.close()
 
         elif 151 <= w <= 170 and 151 <= h <= 170:
             cv2.putText(img, f"don't get close: {inner_w} x {inner_h}", (10, 21), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 185, 255), 2)
@@ -125,3 +122,11 @@ while True:
     # cv2.imshow('img', img_frame)
     cv2.imshow('bin', binary)
 
+    # Stop if escape key is pressed
+    k = cv2.waitKey(30) & 0xff
+    if k == 27:
+        break
+
+# Release the VideoCapture object
+cap.release()
+cv2.destroyAllWindows()
