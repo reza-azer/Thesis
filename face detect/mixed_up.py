@@ -7,8 +7,8 @@ face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_fronta
 
 # Inisialisasi kamera
 cap = cv2.VideoCapture(0)
-brightness = 0  # Rentang -100 hingga 100
-contrast = 0    # Rentang -100 hingga 100
+brightness = 20  # Rentang -100 hingga 100
+contrast = 20    # Rentang -100 hingga 100
 
 
 def create_folders(base_folder):
@@ -65,17 +65,16 @@ try:
                 inner_gray = gray[inner_y:inner_y + inner_h, inner_x:inner_x + inner_w]
                 inner_binary = binary[inner_y:inner_y + inner_h, inner_x:inner_x + inner_w]
                 inner_data = (inner_binary / 255).astype(int)
-                cv2.imshow('biner', inner_binary)
+                
 
                 # Tampilkan status
                 cv2.putText(frame, f"Captured: {count + 1}/{num_images}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1,
                             (0, 0, 0), 2)
                 # Tampil pixel
-                cv2.putText(frame, f" W = {inner_w} x H = {inner_h}", (inner_x, inner_y+inner_h+10), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
-                            (0, 0, 255), 2)
-
+                cv2.putText(frame, f'{inner_w} x {inner_h} pixels', (inner_x, inner_y + inner_h + 15),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
                 # Tunggu untuk capture
-                if 130 <= inner_w <= 140 and 90 <= inner_h <= 100:  # 130 x 90 - 140 x 100 px
+                if 80 <= inner_w <= 90 and 40 <= inner_h <= 50:  # 80 x 40 - 90 x 50 px
                     cv2.putText(frame, "in range, keep steady", (10, 400), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
                     key = cv2.waitKey(1) & 0xFF
@@ -91,10 +90,12 @@ try:
                         count += 1
                     if count >= num_images:
                         break
+                        
+                    cv2.imshow('biner', inner_binary)
 
-                elif 141 <= inner_w or 101 <= inner_h:
+                elif 91 <= inner_w or 51 <= inner_h:
                     cv2.putText(frame, "don't get close", (10, 400), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 185, 255), 2)
-                elif inner_w <= 131 and inner_h <= 89:
+                elif inner_w <= 79 and inner_h <= 39:
                     cv2.putText(frame, "you are too far", (10, 400), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 185, 255), 2)
 
             # tampil visual
