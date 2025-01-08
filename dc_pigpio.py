@@ -1,5 +1,5 @@
 import pigpio
-
+import time
 
 pi = pigpio.pi()
 
@@ -277,18 +277,41 @@ def diagx(speed, torque):
         pi.set_PWM_dutycycle(LPWM_4, 0)
 
 # Mengatur direksi Robot
+def initiate (mula, kecepatan, torsi):
+    if mula == 0:
+        mundur(kecepatan, torsi)
+        time.sleep(0.7)
+        stop()
+        mula + 1
+    else:
+        cc(kecepatan, torsi)
+    return mula
 def maju(kecepatan, torsi):
     forward(kecepatan, torsi)
 def mundur(kecepatan, torsi):
     forward(kecepatan, -torsi)
+def majutans(kecepatan, torsi):
+    forward(kecepatan, torsi)
+    time.sleep(0.1)
+    stop()
+    time.sleep(0.2)
+def mundurtans(kecepatan, torsi):
+    forward(kecepatan, -torsi)
+    time.sleep(0.1)
+    stop()
+    time.sleep(0.2)
 def kanan(kecepatan, torsi):
     turn(kecepatan, torsi)
 def kiri(kecepatan, torsi):
     turn(kecepatan, -torsi)
 def cw(kecepatan, torsi):
     rotate(kecepatan, torsi)
+    time.sleep(0.1)
+    stop()
 def cc(kecepatan, torsi):
     rotate (kecepatan, -torsi)
+    time.sleep(0.1)
+    stop()
 def maju_x(kecepatan, torsi):
     diagy(kecepatan, torsi)
 def mundur_x(kecepatan, torsi) :
