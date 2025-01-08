@@ -3,323 +3,96 @@ import time
 
 pi = pigpio.pi()
 
-# Penomoran pin
-RPWM_1 = 20
-LPWM_1 = 26
-RPWM_4 = 23
-LPWM_4 = 22
-RPWM_2 = 19
-LPWM_2 = 16
-RPWM_3 = 6
-LPWM_3 = 12
+# Pin definitions
+RPWM = [20, 19, 6, 23]
+LPWM = [26, 16, 12, 22]
 
-# Pengaturan GPIO
-pi.set_mode(RPWM_1, pigpio.OUTPUT)
-pi.set_mode(LPWM_1, pigpio.OUTPUT)
-pi.set_mode(RPWM_2, pigpio.OUTPUT)
-pi.set_mode(LPWM_2, pigpio.OUTPUT)
-pi.set_mode(RPWM_3, pigpio.OUTPUT)
-pi.set_mode(LPWM_3, pigpio.OUTPUT)
-pi.set_mode(RPWM_4, pigpio.OUTPUT)
-pi.set_mode(LPWM_4, pigpio.OUTPUT)
+# GPIO setup
+for pin in RPWM + LPWM:
+    pi.set_mode(pin, pigpio.OUTPUT)
 
-# Mengatur arah L/RPWM
+def set_pwm(pin_list, speed, torque):
+    for pin in pin_list:
+        pi.set_PWM_frequency(pin, speed)
+        pi.set_PWM_dutycycle(pin, torque)
+
+# Rotate function
 def rotate(speed, torque):
-    if torque > 0:
-        pi.set_PWM_frequency(RPWM_1, speed)
-        pi.set_PWM_frequency(RPWM_2, speed)
-        pi.set_PWM_frequency(RPWM_3, speed)
-        pi.set_PWM_frequency(RPWM_4, speed)
-
-        pi.set_PWM_dutycycle(RPWM_1, torque)
-        pi.set_PWM_dutycycle(RPWM_2, torque)
-        pi.set_PWM_dutycycle(RPWM_3, torque)
-        pi.set_PWM_dutycycle(RPWM_4, torque)
-
-        pi.set_PWM_frequency(LPWM_1, 0)
-        pi.set_PWM_frequency(LPWM_2, 0)
-        pi.set_PWM_frequency(LPWM_3, 0)
-        pi.set_PWM_frequency(LPWM_4, 0)
-
-        pi.set_PWM_dutycycle(LPWM_1, 0)
-        pi.set_PWM_dutycycle(LPWM_2, 0)
-        pi.set_PWM_dutycycle(LPWM_3, 0)
-        pi.set_PWM_dutycycle(LPWM_4, 0)
-    elif torque < 0:
-        pi.set_PWM_frequency(RPWM_1, 0)
-        pi.set_PWM_frequency(RPWM_2, 0)
-        pi.set_PWM_frequency(RPWM_3, 0)
-        pi.set_PWM_frequency(RPWM_4, 0)
-
-        pi.set_PWM_dutycycle(RPWM_1, 0)
-        pi.set_PWM_dutycycle(RPWM_2, 0)
-        pi.set_PWM_dutycycle(RPWM_3, 0)
-        pi.set_PWM_dutycycle(RPWM_4, 0)
-
-        pi.set_PWM_frequency(LPWM_1, abs(speed))
-        pi.set_PWM_frequency(LPWM_2, abs(speed))
-        pi.set_PWM_frequency(LPWM_3, abs(speed))
-        pi.set_PWM_frequency(LPWM_4, abs(speed))
-
-        pi.set_PWM_dutycycle(LPWM_1, abs(torque))
-        pi.set_PWM_dutycycle(LPWM_2, abs(torque))
-        pi.set_PWM_dutycycle(LPWM_3, abs(torque))
-        pi.set_PWM_dutycycle(LPWM_4, abs(torque))
+    if torque >= 0:
+        set_pwm(RPWM, speed, torque)
     else:
-        pi.set_PWM_dutycycle(RPWM_1, 0)
-        pi.set_PWM_dutycycle(LPWM_1, 0)
-        pi.set_PWM_dutycycle(RPWM_2, 0)
-        pi.set_PWM_dutycycle(LPWM_2, 0)
-        pi.set_PWM_dutycycle(RPWM_3, 0)
-        pi.set_PWM_dutycycle(LPWM_3, 0)
-        pi.set_PWM_dutycycle(RPWM_4, 0)
-        pi.set_PWM_dutycycle(LPWM_4, 0)
+        set_pwm(LPWM, abs(speed), abs(torque))
 
-def forward (speed, torque):
-    if torque > 0:
-        pi.set_PWM_frequency(RPWM_1, 0)
-        pi.set_PWM_frequency(RPWM_2, speed)
-        pi.set_PWM_frequency(RPWM_3, 0)
-        pi.set_PWM_frequency(RPWM_4, 0)
-
-        pi.set_PWM_dutycycle(RPWM_1, 0)
-        pi.set_PWM_dutycycle(RPWM_2, torque)
-        pi.set_PWM_dutycycle(RPWM_3, 0)
-        pi.set_PWM_dutycycle(RPWM_4, 0)
-
-        pi.set_PWM_frequency(LPWM_1, 0)
-        pi.set_PWM_frequency(LPWM_2, 0)
-        pi.set_PWM_frequency(LPWM_3, 0)
-        pi.set_PWM_frequency(LPWM_4, speed)
-
-        pi.set_PWM_dutycycle(LPWM_1, 0)
-        pi.set_PWM_dutycycle(LPWM_2, 0)
-        pi.set_PWM_dutycycle(LPWM_3, 0)
-        pi.set_PWM_dutycycle(LPWM_4, torque)
-    elif torque < 0:
-        pi.set_PWM_frequency(RPWM_1, 0)
-        pi.set_PWM_frequency(RPWM_2, 0)
-        pi.set_PWM_frequency(RPWM_3, 0)
-        pi.set_PWM_frequency(RPWM_4, abs(speed))
-
-        pi.set_PWM_dutycycle(RPWM_1, 0)
-        pi.set_PWM_dutycycle(RPWM_2, 0)
-        pi.set_PWM_dutycycle(RPWM_3, 0)
-        pi.set_PWM_dutycycle(RPWM_4, abs(torque))
-
-        pi.set_PWM_frequency(LPWM_1, 0)
-        pi.set_PWM_frequency(LPWM_2, abs(speed))
-        pi.set_PWM_frequency(LPWM_3, 0)
-        pi.set_PWM_frequency(LPWM_4, 0)
-
-        pi.set_PWM_dutycycle(LPWM_1, 0)
-        pi.set_PWM_dutycycle(LPWM_2, abs(torque))
-        pi.set_PWM_dutycycle(LPWM_3, 0)
-        pi.set_PWM_dutycycle(LPWM_4, 0)
+# Forward function
+def forward(speed, torque):
+    if torque >= 0:
+        set_pwm([RPWM[1], LPWM[3]], speed, torque)
     else:
-        pi.set_PWM_dutycycle(RPWM_1, 0)
-        pi.set_PWM_dutycycle(LPWM_1, 0)
-        pi.set_PWM_dutycycle(RPWM_2, 0)
-        pi.set_PWM_dutycycle(LPWM_2, 0)
-        pi.set_PWM_dutycycle(RPWM_3, 0)
-        pi.set_PWM_dutycycle(LPWM_3, 0)
-        pi.set_PWM_dutycycle(RPWM_4, 0)
-        pi.set_PWM_dutycycle(LPWM_4, 0)
-def turn (speed, torque):
-    if torque > 0:
-        pi.set_PWM_frequency(RPWM_1, speed)
-        pi.set_PWM_frequency(RPWM_2, 0)
-        pi.set_PWM_frequency(RPWM_3, 0)
-        pi.set_PWM_frequency(RPWM_4, 0)
+        set_pwm([RPWM[3], LPWM[1]], abs(speed), abs(torque))
 
-        pi.set_PWM_dutycycle(RPWM_1, torque)
-        pi.set_PWM_dutycycle(RPWM_2, 0)
-        pi.set_PWM_dutycycle(RPWM_3, 0)
-        pi.set_PWM_dutycycle(RPWM_4, 0)
-
-        pi.set_PWM_frequency(LPWM_1, 0)
-        pi.set_PWM_frequency(LPWM_2, 0)
-        pi.set_PWM_frequency(LPWM_3, speed)
-        pi.set_PWM_frequency(LPWM_4, 0)
-
-        pi.set_PWM_dutycycle(LPWM_1, 0)
-        pi.set_PWM_dutycycle(LPWM_2, 0)
-        pi.set_PWM_dutycycle(LPWM_3, torque)
-        pi.set_PWM_dutycycle(LPWM_4, 0)
-    elif torque < 0:
-        pi.set_PWM_frequency(RPWM_1, 0)
-        pi.set_PWM_frequency(RPWM_2, 0)
-        pi.set_PWM_frequency(RPWM_3, abs(speed))
-        pi.set_PWM_frequency(RPWM_4, 0)
-
-        pi.set_PWM_dutycycle(RPWM_1, 0)
-        pi.set_PWM_dutycycle(RPWM_2, 0)
-        pi.set_PWM_dutycycle(RPWM_3, abs(torque))
-        pi.set_PWM_dutycycle(RPWM_4, 0)
-
-        pi.set_PWM_frequency(LPWM_1, abs(speed))
-        pi.set_PWM_frequency(LPWM_2, 0)
-        pi.set_PWM_frequency(LPWM_3, 0)
-        pi.set_PWM_frequency(LPWM_4, 0)
-
-        pi.set_PWM_dutycycle(LPWM_1, abs(torque))
-        pi.set_PWM_dutycycle(LPWM_2, 0)
-        pi.set_PWM_dutycycle(LPWM_3, 0)
-        pi.set_PWM_dutycycle(LPWM_4, 0)
+# Turn function
+def turn(speed, torque):
+    if torque >= 0:
+        set_pwm([RPWM[0], LPWM[2]], speed, torque)
     else:
-        pi.set_PWM_dutycycle(RPWM_1, 0)
-        pi.set_PWM_dutycycle(LPWM_1, 0)
-        pi.set_PWM_dutycycle(RPWM_2, 0)
-        pi.set_PWM_dutycycle(LPWM_2, 0)
-        pi.set_PWM_dutycycle(RPWM_3, 0)
-        pi.set_PWM_dutycycle(LPWM_3, 0)
-        pi.set_PWM_dutycycle(RPWM_4, 0)
-        pi.set_PWM_dutycycle(LPWM_4, 0)
+        set_pwm([RPWM[2], LPWM[0]], abs(speed), abs(torque))
+
+# Diagonal Y function
 def diagy(speed, torque):
-    if torque > 0:
-        pi.set_PWM_frequency(RPWM_1, speed)
-        pi.set_PWM_frequency(RPWM_2, speed)
-        pi.set_PWM_frequency(RPWM_3, 0)
-        pi.set_PWM_frequency(RPWM_4, 0)
-
-        pi.set_PWM_dutycycle(RPWM_1, torque)
-        pi.set_PWM_dutycycle(RPWM_2, torque)
-        pi.set_PWM_dutycycle(RPWM_3, 0)
-        pi.set_PWM_dutycycle(RPWM_4, 0)
-
-        pi.set_PWM_frequency(LPWM_1, 0)
-        pi.set_PWM_frequency(LPWM_2, 0)
-        pi.set_PWM_frequency(LPWM_3, speed)
-        pi.set_PWM_frequency(LPWM_4, speed)
-
-        pi.set_PWM_dutycycle(LPWM_1, 0)
-        pi.set_PWM_dutycycle(LPWM_2, 0)
-        pi.set_PWM_dutycycle(LPWM_3, torque)
-        pi.set_PWM_dutycycle(LPWM_4, torque)
-    elif speed < 0:
-        pi.set_PWM_frequency(RPWM_1, 0)
-        pi.set_PWM_frequency(RPWM_2, 0)
-        pi.set_PWM_frequency(RPWM_3, abs(speed))
-        pi.set_PWM_frequency(RPWM_4, abs(speed))
-
-        pi.set_PWM_dutycycle(RPWM_1, 0)
-        pi.set_PWM_dutycycle(RPWM_2, 0)
-        pi.set_PWM_dutycycle(RPWM_3, abs(torque))
-        pi.set_PWM_dutycycle(RPWM_4, abs(torque))
-
-        pi.set_PWM_frequency(LPWM_1, abs(speed))
-        pi.set_PWM_frequency(LPWM_2, abs(speed))
-        pi.set_PWM_frequency(LPWM_3, 0)
-        pi.set_PWM_frequency(LPWM_4, 0)
-
-        pi.set_PWM_dutycycle(LPWM_1, abs(torque))
-        pi.set_PWM_dutycycle(LPWM_2, abs(torque))
-        pi.set_PWM_dutycycle(LPWM_3, 0)
-        pi.set_PWM_dutycycle(LPWM_4, 0)
+    if torque >= 0:
+        set_pwm([RPWM[0], RPWM[1], LPWM[2], LPWM[3]], speed, torque)
     else:
-        pi.set_PWM_dutycycle(RPWM_1, 0)
-        pi.set_PWM_dutycycle(LPWM_1, 0)
-        pi.set_PWM_dutycycle(RPWM_2, 0)
-        pi.set_PWM_dutycycle(LPWM_2, 0)
-        pi.set_PWM_dutycycle(RPWM_3, 0)
-        pi.set_PWM_dutycycle(LPWM_3, 0)
-        pi.set_PWM_dutycycle(RPWM_4, 0)
-        pi.set_PWM_dutycycle(LPWM_4, 0)
+        set_pwm([RPWM[2], RPWM[3], LPWM[0], LPWM[1]], abs(speed), abs(torque))
+
+# Diagonal X function
 def diagx(speed, torque):
-    if torque > 0:
-        pi.set_PWM_frequency(RPWM_1, 0)
-        pi.set_PWM_frequency(RPWM_2, speed)
-        pi.set_PWM_frequency(RPWM_3, speed)
-        pi.set_PWM_frequency(RPWM_4, 0)
-
-        pi.set_PWM_dutycycle(RPWM_1, 0)
-        pi.set_PWM_dutycycle(RPWM_2, torque)
-        pi.set_PWM_dutycycle(RPWM_3, torque)
-        pi.set_PWM_dutycycle(RPWM_4, 0)
-
-        pi.set_PWM_frequency(LPWM_1, speed)
-        pi.set_PWM_frequency(LPWM_2, 0)
-        pi.set_PWM_frequency(LPWM_3, 0)
-        pi.set_PWM_frequency(LPWM_4, speed)
-
-        pi.set_PWM_dutycycle(LPWM_1, torque)
-        pi.set_PWM_dutycycle(LPWM_2, 0)
-        pi.set_PWM_dutycycle(LPWM_3, 0)
-        pi.set_PWM_dutycycle(LPWM_4, torque)
-    elif torque < 0:
-        pi.set_PWM_frequency(RPWM_1, abs(speed))
-        pi.set_PWM_frequency(RPWM_2, 0)
-        pi.set_PWM_frequency(RPWM_3, 0)
-        pi.set_PWM_frequency(RPWM_4, abs(speed))
-
-        pi.set_PWM_dutycycle(RPWM_1, abs(torque))
-        pi.set_PWM_dutycycle(RPWM_2, 0)
-        pi.set_PWM_dutycycle(RPWM_3, 0)
-        pi.set_PWM_dutycycle(RPWM_4, abs(torque))
-
-        pi.set_PWM_frequency(LPWM_1, 0)
-        pi.set_PWM_frequency(LPWM_2, abs(speed))
-        pi.set_PWM_frequency(LPWM_3, abs(speed))
-        pi.set_PWM_frequency(LPWM_4, 0)
-
-        pi.set_PWM_dutycycle(LPWM_1, 0)
-        pi.set_PWM_dutycycle(LPWM_2, abs(torque))
-        pi.set_PWM_dutycycle(LPWM_3, abs(torque))
-        pi.set_PWM_dutycycle(LPWM_4, 0)
+    if torque >= 0:
+        set_pwm([RPWM[1], RPWM[2], LPWM[0], LPWM[3]], speed, torque)
     else:
-        pi.set_PWM_dutycycle(RPWM_1, 0)
-        pi.set_PWM_dutycycle(LPWM_1, 0)
-        pi.set_PWM_dutycycle(RPWM_2, 0)
-        pi.set_PWM_dutycycle(LPWM_2, 0)
-        pi.set_PWM_dutycycle(RPWM_3, 0)
-        pi.set_PWM_dutycycle(LPWM_3, 0)
-        pi.set_PWM_dutycycle(RPWM_4, 0)
-        pi.set_PWM_dutycycle(LPWM_4, 0)
+        set_pwm([RPWM[0], RPWM[3], LPWM[1], LPWM[2]], abs(speed), abs(torque))
 
-# Mengatur direksi Robot
-def initiate (mula, kecepatan, torsi):
-    if mula == 0:
-        mundur(kecepatan, torsi)
-        time.sleep(0.7)
-        stop()
-        mula + 1
-    else:
-        cc(kecepatan, torsi)
-    return mula
+# Stop function
+def stop():
+    set_pwm(RPWM + LPWM, 0, 0)
+
+# Robot direction control functions
 def maju(kecepatan, torsi):
     forward(kecepatan, torsi)
+
 def mundur(kecepatan, torsi):
     forward(kecepatan, -torsi)
+
 def majutans(kecepatan, torsi):
     forward(kecepatan, torsi)
     time.sleep(0.1)
     stop()
-    time.sleep(0.2)
+
 def mundurtans(kecepatan, torsi):
     forward(kecepatan, -torsi)
     time.sleep(0.1)
     stop()
     time.sleep(0.2)
+
 def kanan(kecepatan, torsi):
     turn(kecepatan, torsi)
+
 def kiri(kecepatan, torsi):
     turn(kecepatan, -torsi)
+
 def cw(kecepatan, torsi):
     rotate(kecepatan, torsi)
-    time.sleep(0.1)
-    stop()
+
 def cc(kecepatan, torsi):
-    rotate (kecepatan, -torsi)
-    time.sleep(0.1)
-    stop()
+    rotate(kecepatan, -torsi)
+
 def maju_x(kecepatan, torsi):
     diagy(kecepatan, torsi)
-def mundur_x(kecepatan, torsi) :
+
+def mundur_x(kecepatan, torsi):
     diagy(kecepatan, -torsi)
+
 def kiri_x(kecepatan, torsi):
     diagx(kecepatan, torsi)
-def kanan_x(kecepatan, torsi):
-    diagx(kecepatan, -torsi)
-def stop():
-    rotate(0,0)
 
+def kanan_x(kecepatan, torsi):
+    diagx(kecepatan, -torsi)    
