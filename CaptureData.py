@@ -1,5 +1,4 @@
 import os
-
 import cv2
 
 # Inisialisasi Haar Cascade untuk deteksi wajah
@@ -7,8 +6,8 @@ face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_fronta
 
 # Inisialisasi kamera
 cap = cv2.VideoCapture(0)
-brightness = 10  # Rentang -100 hingga 100
-contrast = 10    # Rentang -100 hingga 100
+brightness = 0  # Rentang -100 hingga 100
+contrast = 0    # Rentang -100 hingga 100
 
 
 def create_folders(base_folder):
@@ -55,7 +54,7 @@ try:
                 inner_w = w - 40
                 inner_h = h - 70
                 inner_x = x + 20
-                inner_y = y + 20
+                inner_y = y + 30
 
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
                 cv2.rectangle(frame, (inner_x, inner_y), (inner_x + inner_w, inner_y + inner_h), (0, 0, 255), 2)
@@ -74,7 +73,7 @@ try:
                 cv2.putText(frame, f'{inner_w} x {inner_h} pixels', (inner_x, inner_y + inner_h + 15),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
                 # Tunggu untuk capture
-                if 80 <= inner_w <= 95 and 50 <= inner_h <= 65:  # 80 x 40 - 90 x 50 px
+                if 60 <= inner_w <= 70 and 30 <= inner_h <= 40:  # 60 x 30 - 70 x 40 px
                     cv2.putText(frame, "in range, keep steady", (10, 400), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
                     key = cv2.waitKey(1) & 0xFF
@@ -92,22 +91,20 @@ try:
                     if count >= num_images:
                         break
                         
-                    cv2.imshow('biner', inner_binary)
+
 
 
                 # elif 91 <= inner_w or 51 <= inner_h:
                 #     cv2.putText(frame, "don't get close", (10, 400), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 185, 255), 2)
                 # elif inner_w <= 79 and inner_h <= 39:
                 #     cv2.putText(frame, "you are too far", (10, 400), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 185, 255), 2)
-
+           # cv2.imshow('biner', inner_binary)
             # tampil visual
             cv2.imshow('Frame', frame)
 
             # Panel Input
             key = cv2.waitKey(1) & 0xFF
-            if key == 27:  # Tekan 'esc' untuk keluar
-                break
-            elif key == ord('w'):  # Tekan 'w' untuk menambah kecerahan
+            if key == ord('w'):  # Tekan 'w' untuk menambah kecerahan
                 brightness += 10
                 print(f"Kecerahan: {brightness}")
             elif key == ord('s'):  # Tekan 's' untuk mengurangi kecerahan
