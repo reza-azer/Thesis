@@ -9,8 +9,8 @@ cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
-brightness = 20  # Range: -100 to 100
-contrast = 0    # Range: -100 to 100
+brightness = 10  # Range: -100 to 100
+contrast = 10    # Range: -100 to 100
 inner_x = 0
 mula = 1
 
@@ -34,7 +34,7 @@ def draw_rectangles(frame, faces):
 
 def control_motors(inner_w, inner_h, x, y, frame, w, h):
     """Control motors based on detected face position."""
-    if 70 <= inner_w <= 80 and 30 <= inner_h <= 40:
+    if 60 <= inner_w <= 70 and 30 <= inner_h <= 40:
         ft.track_face(frame, x, y, w, h)
         cv2.putText(frame, "in range, keep steady", (10, 400), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
     elif inner_w <= 49:
