@@ -13,6 +13,7 @@ brightness = 10  # Range: -100 to 100
 contrast = 10    # Range: -100 to 100
 inner_x = 0
 mula = 1
+last_direction = None  # Track last direction: 'maju' or 'mundur'
 
 def adjust_frame(img, contrast, brightness):
     """Adjust brightness and contrast of the frame."""
@@ -29,20 +30,32 @@ def draw_rectangles(frame, faces):
         inner_w, inner_h = w - 40, h - 80
         inner_x, inner_y = x + 20, y + 30
         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-        cv2.rectangle(frame, (inner_x, inner_y), (inner_x + inner_w, inner_y + inner_h), (0, 0, 255), 2)
+        cv2.rectangle(frame, (inner_x, inner_y), (inner_x + inner_w), (inner_y + inner_h), (0, 0, 255), 2)
         return inner_w, inner_h, inner_x, inner_y
 
 def control_motors(inner_w, inner_h, x, y, frame, w, h):
     """Control motors based on detected face position."""
+    global last_direction
     if 60 <= inner_w <= 70 and 30 <= inner_h <= 40:
+        if last_direction == 'maju':
+            threading.Thread(target=dp.mundur, args=(10000, 70)).start()
+            time.sleep(0.3)
+            dp.stop()
+        elif last_direction == 'mundur':
+            threading.Thread(target=dp.maju, args=(10000, 70)).start()
+            time.sleep(0.3)
+            dp.stop()
+        last_direction = None
         ft.track_face(frame, x, y, w, h)
         cv2.putText(frame, "in range, keep steady", (10, 400), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
     elif inner_w <= 49:
         threading.Thread(target=dp.maju, args=(10000, 70)).start()
         cv2.putText(frame, "too far", (10, 400), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+        last_direction = 'maju'
     elif 101 <= inner_w:
         threading.Thread(target=dp.mundur, args=(10000, 70)).start()
         cv2.putText(frame, "too close", (10, 400), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+        last_direction = 'mundur'
     if x <= 80:
         threading.Thread(target=dp.cc, args=(1000, 30)).start()
     elif x + w >= 500:
