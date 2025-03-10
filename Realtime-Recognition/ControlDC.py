@@ -55,7 +55,7 @@ def diagx(speed, torque):
 # Stop function
 def stop():
     set_pwm(RPWM + LPWM, 0, 0)
-
+'''Main Function'''
 # Robot direction control functions
 def maju(kecepatan, torsi):
     forward(kecepatan, torsi)
